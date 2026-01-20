@@ -2,12 +2,6 @@
 #include <string.h>
 #include "funciones.h"
 
-/* Prototipo para limpiar el buffer si usas scanf en algun lugar (no necesario aqui) */
-static void limpiarStdin(void) {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) { }
-}
-
 int main(void) {
     Libro biblioteca[MAX_LIBROS];
     int contador;
@@ -24,68 +18,78 @@ int main(void) {
         printf("5. Mostrar libros\n");
         printf("6. Eliminar libro\n");
         printf("7. Salir\n");
-        printf("Selecciona una opcion: ");
-
-        if (scanf("%d", &opcion) != 1) {
-            printf("Entrada invalida. Reiniciando opcion.\n");
-            limpiarStdin();
-            opcion = -1;
-        } else {
-            limpiarStdin(); /* quitar el newline despues del scanf */
-        }
+        printf("Seleccione opcion: ");
+        scanf("%d", &opcion);
+        getchar();
 
         switch (opcion) {
             case 1:
                 agregarLibro(biblioteca, &contador);
                 break;
-            case 5:
-                mostrarLibros(biblioteca, contador);
-                break;
+
             case 2: {
-                char id[MAX_ID];
+                int id;
                 printf("ID: ");
-                /* usar fgets para leer linea */
-                if (fgets(id, MAX_ID, stdin) == NULL) id[0] = '\0';
-                id[strcspn(id, "\n")] = '\0';
+                scanf("%d", &id);
+                getchar();
                 int pos = buscarLibroPorID(biblioteca, contador, id);
                 if (pos >= 0) {
-                    const Libro *l = &biblioteca[pos];
-                    printf("Libro encontrado:\nID: %s\nTitulo: %s\nAutor: %s\nAnio: %d\nEstado: %s\n",
-                           l->id, l->titulo, l->autor, l->anio, l->estado);
+                    printf("Libro encontrado:\n");
+                    printf("ID: %d\nTitulo: %s\nAutor: %s\nAño: %d\nEstado: %s\n",
+                           biblioteca[pos].id,
+                           biblioteca[pos].titulo,
+                           biblioteca[pos].autor,
+                           biblioteca[pos].anio,
+                           biblioteca[pos].estado);
                 } else {
-                    printf("No existe libro con ID '%s'.\n", id);
+                    printf("No existe ese ID.\n");
                 }
                 break;
             }
+
             case 3: {
                 char titulo[MAX_TITULO];
                 printf("Titulo: ");
-                if (fgets(titulo, MAX_TITULO, stdin) == NULL) titulo[0] = '\0';
-                titulo[strcspn(titulo, "\n")] = '\0';
+                fgets(titulo, MAX_TITULO, stdin);
+                titulo[strcspn(titulo, "\n")] = 0;
+
                 int pos = buscarLibroPorTitulo(biblioteca, contador, titulo);
                 if (pos >= 0) {
-                    const Libro *l = &biblioteca[pos];
-                    printf("Libro encontrado:\nID: %s\nTitulo: %s\nAutor: %s\nAnio: %d\nEstado: %s\n",
-                           l->id, l->titulo, l->autor, l->anio, l->estado);
+                    printf("Libro encontrado:\n");
+                    printf("ID: %d\nTitulo: %s\nAutor: %s\nAño: %d\nEstado: %s\n",
+                           biblioteca[pos].id,
+                           biblioteca[pos].titulo,
+                           biblioteca[pos].autor,
+                           biblioteca[pos].anio,
+                           biblioteca[pos].estado);
                 } else {
-                    printf("No existe libro con titulo parecido a '%s'.\n", titulo);
+                    printf("No existe ese titulo.\n");
                 }
                 break;
             }
+
             case 4:
                 actualizarEstado(biblioteca, contador);
                 break;
+
+            case 5:
+                mostrarLibros(biblioteca, contador);
+                break;
+
             case 6:
                 eliminarLibro(biblioteca, &contador);
                 break;
+
             case 7:
                 printf("Saliendo...\n");
                 break;
+
             default:
                 printf("Opcion invalida.\n");
+                break;
         }
 
-    } while (opcion != 0);
+    } while (opcion != 7);
 
     return 0;
 }
